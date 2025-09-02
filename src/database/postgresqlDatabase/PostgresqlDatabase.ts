@@ -1,3 +1,5 @@
+import { Sequelize } from "sequelize-typescript";
+
 import { Database } from "../Database";
 import { Article, ArticleCreater } from "./models/Article";
 import { Article as ArticleInterface } from "../../Interfaces/elements/Article";
@@ -7,14 +9,20 @@ import { Chapter } from "./models/Chapter";
 import { ChapterCreator, Chapter as ChapterInterface } from "../../Interfaces/elements/Chapter";
 import { Magazine } from "./models/Magazine";
 import { MagazineCreator, Magazine as MagazineInterface } from "../../Interfaces/elements/Magazine";
-import { PostgresqlBaseElement } from "./PostgresqlBaseElement";
-import { sequelize } from "./Sequelize";
+import { PostgresqlBaseFunctions } from "./PostgresqlBaseFunctions";
+import { AuthorsForArticle } from "./models/AuthorsForArticle";
+import { readFileSync } from "fs";
+
+const dbConfig = JSON.parse(readFileSync("./src/config/postgresqlConfig.json").toString());
+export const sequelize = new Sequelize({ ...dbConfig, dialect: "postgres" });
+
+sequelize.addModels([ Article,Author,Chapter,Magazine,AuthorsForArticle ]);
 
 export class PostgresqlDatabase implements Database{
-	authors = new PostgresqlBaseElement<AuthorInterface, AuthorCreator,Author>(Author,(x) => x.dataValues, x => new Author({ ...x }));
-	magazines = new PostgresqlBaseElement<MagazineInterface,MagazineCreator,Magazine>(Magazine,(x) => x.dataValues,x => new Magazine({ ...x }));
-	articles = new PostgresqlBaseElement<ArticleInterface,ArticleCreater,Article>(Article,(x) => x.dataValues, x => new Article({ ...x }));
-	chapters  = new PostgresqlBaseElement<ChapterInterface,ChapterCreator,Chapter>(Chapter,(x) => x.dataValues, x => new Chapter({ ...x }));
+	authors = new PostgresqlBaseFunctions<AuthorInterface, AuthorCreator,Author>(Author,(x) => x.dataValues, x => new Author({ ...x }));
+	magazines = new PostgresqlBaseFunctions<MagazineInterface,MagazineCreator,Magazine>(Magazine,(x) => x.dataValues,x => new Magazine({ ...x }));
+	articles = new PostgresqlBaseFunctions<ArticleInterface,ArticleCreater,Article>(Article,(x) => x.dataValues, x => new Article({ ...x }));
+	chapters  = new PostgresqlBaseFunctions<ChapterInterface,ChapterCreator,Chapter>(Chapter,(x) => x.dataValues, x => new Chapter({ ...x }));
 
 	getArticlesByAuthor = async (authorId: number,pagination?: {skip?: number,limit?: number}) => {
 		return Article.findAll({

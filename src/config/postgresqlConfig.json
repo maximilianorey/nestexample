@@ -1,0 +1,7 @@
+{
+	"database": "test",
+	"username": "test",
+	"password": "test",
+	"port": 8888,
+	"host": "127.0.0.1"
+}

@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./controller/AppController";
-import { providers } from "providers";
+import { providers } from "./config/config";
 
 
 @Module({
